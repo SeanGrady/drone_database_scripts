@@ -1,7 +1,7 @@
 from code import interact
 import re
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy import Column, Integer, Float, String, create_engine, ForeignKey
+from sqlalchemy import Column, DateTime, Integer, Float, String, create_engine, ForeignKey
 from sqlalchemy.orm import relationship
 
 #sneaky regex
@@ -23,7 +23,7 @@ class MyMixin(object):
 
     id = Column(Integer, primary_key=True)
 
-
+#TODO: Change this if sensor_reads changes
 class Sensors(MyMixin, Base):
     sensor_type_id = Column(Integer, ForeignKey('sensor_types'.id))
     sensor_type = relationship("SensorTypes", back_populates="extant_sensors")
@@ -39,6 +39,9 @@ class SensorTypes(MyMixin, Base):
     extant_sensors = relationship("Sensors", back_populates="sensor_type")
 
 #TODO: Ask Ryan if I've done this polymorphic business correctly
+#TODO: Maybe this should point to mission_drone_sensor and not sensors,
+# otherwise how do you know which mission this reading is on? Either you don't
+# or you aren't normalizing properly I think.
 class SensorReads(MyMixin, Base):
     sensor_id = Column(Integer, ForeignKey('sensors'.id))
     sensor = relationship("Sensors", back_populates="sensor_readings")
@@ -55,6 +58,9 @@ class SensorReads(MyMixin, Base):
 
 
 #TODO: Figure out how events are going to work and add fields accordingly
+# I think the thing is just going to be that there's some code somewhere that
+# decides when it's a good idea to take an air sensor reading, and that's an
+# event. GPS should probably read ~1hz regardless.
 class Events(MyMixin, Base):
     sensor_readings = relationship("SensorReads", back_populates='event')
 
@@ -68,6 +74,7 @@ class MissionDrones(MyMixin, Base):
     mission_sensors = relationship("MissionDroneSensors", 
                                     back_populates='mission_drone')
 
+#TODO:Change this if sensor_reads changes
 class MissionDroneSensors(MyMixin, Base):
     mission_drone_id = Column(Integer, ForeignKey('mission_drones'.id))
     mission_drone = relationship('MissionDrones',
@@ -78,12 +85,15 @@ class MissionDroneSensors(MyMixin, Base):
 
 #TODO: Figure out how missions are going to be stored and add fields
 class Missions(MyMixin, Base):
-    description = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False)
+    date = Column(DateTime, nullable=False)
+    location = Column(String(100), nullable=False)
 
     drones = relationship("MissionDrones", back_populates="mission")
 
 class Drones(MyMixin, Base):
-    description = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False)
+    FAA_ID = Column(String(100), nullable=False)
 
     mission_instances = relationship("MissionDrones", back_populates='drone')
 
@@ -100,6 +110,7 @@ class GPSSensorReads(SensorReads):
     __mapper_args__ = {'polymorphic_identity': 'GPS'}
 
     id = Column(Integer, ForeignKey('sensor_reads'.id), primary_key=True)
+    #remember that these should be global to avoid confusion
     lat = Column(Float)
     lon = Column(Float)
     alt = Column(Float)
