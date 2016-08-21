@@ -1,0 +1,192 @@
+-- ---
+-- Globals
+-- ---
+
+-- SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+-- SET FOREIGN_KEY_CHECKS=0;
+
+-- ---
+-- Table 'missions'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `missions`;
+        
+CREATE TABLE `missions` (
+  `id` INTEGER AUTO_INCREMENT,
+  `description` VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'drones'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `drones`;
+        
+CREATE TABLE `drones` (
+  `id` INTEGER AUTO_INCREMENT,
+  `description` VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'sensor_types'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `sensor_types`;
+        
+CREATE TABLE `sensor_types` (
+  `id` INTEGER AUTO_INCREMENT,
+  `sensor_type` VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'sensors'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `sensors`;
+        
+CREATE TABLE `sensors` (
+  `id` INTEGER AUTO_INCREMENT,
+  `sensor_type_id` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'sensor_reads'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `sensor_reads`;
+        
+CREATE TABLE `sensor_reads` (
+  `id` INTEGER AUTO_INCREMENT,
+  `sensor_id` INTEGER NULL DEFAULT NULL,
+  `event_id` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'mission_drones'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `mission_drones`;
+        
+CREATE TABLE `mission_drones` (
+  `id` INTEGER AUTO_INCREMENT,
+  `mission_id` INTEGER NULL DEFAULT NULL,
+  `drone_id` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'mission_drone_sensors'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `mission_drone_sensors`;
+        
+CREATE TABLE `mission_drone_sensors` (
+  `id` INTEGER AUTO_INCREMENT,
+  `mission_drone_id` INTEGER NULL DEFAULT NULL,
+  `sensor_id` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'events'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `events`;
+        
+CREATE TABLE `events` (
+  `id` INTEGER AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'air_sensor_reads'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `air_sensor_reads`;
+        
+CREATE TABLE `air_sensor_reads` (
+  `id` INTEGER AUTO_INCREMENT,
+  `sensor_read_id` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'gps_sensor_reads'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `gps_sensor_reads`;
+        
+CREATE TABLE `gps_sensor_reads` (
+  `id` INTEGER AUTO_INCREMENT,
+  `sensor_read_id` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Foreign Keys 
+-- ---
+
+ALTER TABLE `sensors` ADD FOREIGN KEY (sensor_type_id) REFERENCES `sensor_types` (`id`);
+ALTER TABLE `sensor_reads` ADD FOREIGN KEY (sensor_id) REFERENCES `sensors` (`id`);
+ALTER TABLE `sensor_reads` ADD FOREIGN KEY (event_id) REFERENCES `events` (`id`);
+ALTER TABLE `mission_drones` ADD FOREIGN KEY (mission_id) REFERENCES `missions` (`id`);
+ALTER TABLE `mission_drones` ADD FOREIGN KEY (drone_id) REFERENCES `drones` (`id`);
+ALTER TABLE `mission_drone_sensors` ADD FOREIGN KEY (mission_drone_id) REFERENCES `mission_drones` (`id`);
+ALTER TABLE `mission_drone_sensors` ADD FOREIGN KEY (sensor_id) REFERENCES `sensors` (`id`);
+ALTER TABLE `air_sensor_reads` ADD FOREIGN KEY (sensor_read_id) REFERENCES `sensor_reads` (`id`);
+ALTER TABLE `gps_sensor_reads` ADD FOREIGN KEY (sensor_read_id) REFERENCES `sensor_reads` (`id`);
+
+-- ---
+-- Table Properties
+-- ---
+
+-- ALTER TABLE `missions` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `drones` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `sensor_types` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `sensors` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `sensor_reads` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `mission_drones` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `mission_drone_sensors` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `events` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `air_sensor_reads` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `gps_sensor_reads` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ---
+-- Test Data
+-- ---
+
+-- INSERT INTO `missions` (`id`,`description`) VALUES
+-- ('','');
+-- INSERT INTO `drones` (`id`,`description`) VALUES
+-- ('','');
+-- INSERT INTO `sensor_types` (`id`,`sensor_type`) VALUES
+-- ('','');
+-- INSERT INTO `sensors` (`id`,`sensor_type_id`) VALUES
+-- ('','');
+-- INSERT INTO `sensor_reads` (`id`,`sensor_id`,`event_id`) VALUES
+-- ('','','');
+-- INSERT INTO `mission_drones` (`id`,`mission_id`,`drone_id`) VALUES
+-- ('','','');
+-- INSERT INTO `mission_drone_sensors` (`id`,`mission_drone_id`,`sensor_id`) VALUES
+-- ('','','');
+-- INSERT INTO `events` (`id`) VALUES
+-- ('');
+-- INSERT INTO `air_sensor_reads` (`id`,`sensor_read_id`) VALUES
+-- ('','');
+-- INSERT INTO `gps_sensor_reads` (`id`,`sensor_read_id`) VALUES
+-- ('','');
