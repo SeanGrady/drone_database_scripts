@@ -9,7 +9,7 @@ def snake_case(string):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', string)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-db_name = 'mission_data'
+db_name = 'mission_data_test'
 db_url = 'mysql+mysqldb://root:password@localhost/' + db_name
 engine = create_engine(db_url)
 Base = declarative_base()
@@ -25,7 +25,7 @@ class MyMixin(object):
 
 #TODO: Change this if sensor_reads changes
 class Sensors(MyMixin, Base):
-    sensor_type_id = Column(Integer, ForeignKey('sensor_types'.id))
+    sensor_type_id = Column(Integer, ForeignKey('sensor_types.id'))
     sensor_type = relationship("SensorTypes", back_populates="extant_sensors")
 
     sensor_readings = relationship("SensorReads", back_populates="sensor")
@@ -43,10 +43,10 @@ class SensorTypes(MyMixin, Base):
 # otherwise how do you know which mission this reading is on? Either you don't
 # or you aren't normalizing properly I think.
 class SensorReads(MyMixin, Base):
-    sensor_id = Column(Integer, ForeignKey('sensors'.id))
+    sensor_id = Column(Integer, ForeignKey('sensors.id'))
     sensor = relationship("Sensors", back_populates="sensor_readings")
 
-    event_id = Column(Integer, ForeignKey('events'.id))
+    event_id = Column(Integer, ForeignKey('events.id'))
     event = relationship("Events", back_populates='sensor_readings')
 
     mission_time = Column(Integer)
@@ -65,10 +65,10 @@ class Events(MyMixin, Base):
     sensor_readings = relationship("SensorReads", back_populates='event')
 
 class MissionDrones(MyMixin, Base):
-    mission_id = Column(Integer, ForeignKey('missions'.id))
+    mission_id = Column(Integer, ForeignKey('missions.id'))
     mission = relationship("Missions", back_populates='drones')
 
-    drone_id = Column(Integer, ForeignKey('drones'.id))
+    drone_id = Column(Integer, ForeignKey('drones.id'))
     drone = relationship("Drones", back_populates='mission_instances')
 
     mission_sensors = relationship("MissionDroneSensors", 
@@ -76,11 +76,11 @@ class MissionDrones(MyMixin, Base):
 
 #TODO:Change this if sensor_reads changes
 class MissionDroneSensors(MyMixin, Base):
-    mission_drone_id = Column(Integer, ForeignKey('mission_drones'.id))
+    mission_drone_id = Column(Integer, ForeignKey('mission_drones.id'))
     mission_drone = relationship('MissionDrones',
                                  back_populates='mission_sensors')
 
-    sensor_id = Column(Integer, ForeignKey('sensors'.id))
+    sensor_id = Column(Integer, ForeignKey('sensors.id'))
     sensor = relationship("Sensors", back_populates='mission_drone_instances')
 
 #TODO: Figure out how missions are going to be stored and add fields
@@ -98,18 +98,21 @@ class Drones(MyMixin, Base):
     mission_instances = relationship("MissionDrones", back_populates='drone')
 
 #TODO: Ask Ryan what to do about frequently changing data structure
+#TODO: Figure out why I can't use cls here but can use it in the mixin class
 class AirSensorReads(SensorReads):
-    __tablename__ = snake_case(cls.__name__)
+    __tablename__ = 'air_sensor_reads'
+    #__tablename__ = snake_case(cls.__name__)
     __mapper_args__ = {'polymorphic_identity': 'air_sensor'}
 
-    id = Column(Integer, ForeignKey('sensor_reads'.id), primary_key=True)
+    id = Column(Integer, ForeignKey('sensor_reads.id'), primary_key=True)
     AQI = Column(Integer)
 
 class GPSSensorReads(SensorReads):
-    __tablename__ = snake_case(cls.__name__)
+    __tablename__ = 'GPS_sensor_reads'
+    #__tablename__ = snake_case(cls.__name__)
     __mapper_args__ = {'polymorphic_identity': 'GPS'}
 
-    id = Column(Integer, ForeignKey('sensor_reads'.id), primary_key=True)
+    id = Column(Integer, ForeignKey('sensor_reads.id'), primary_key=True)
     #remember that these should be global to avoid confusion
     lat = Column(Float)
     lon = Column(Float)
