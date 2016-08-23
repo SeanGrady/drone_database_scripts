@@ -10,6 +10,7 @@ Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
 
+#TODO: explicit names, no shortening
 class SensorReading(Base):
     __tablename__ = 'sensor_readings'
 
