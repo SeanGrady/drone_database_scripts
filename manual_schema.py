@@ -1,4 +1,3 @@
-from code import interact
 import re
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, DateTime, Integer, Float, String, create_engine, ForeignKey
